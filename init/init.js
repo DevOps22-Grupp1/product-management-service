@@ -4,7 +4,10 @@ db.createUser({
     roles: [
         {
             role: "readWrite",
+
             db: "userdatabase",
+
+
         },
     ],
 });
@@ -40,4 +43,6 @@ db.users.insertMany([{
     name: "Zoreh Svensson",
     email: "zs@gmail.com",
 }
+
 ]);
+
