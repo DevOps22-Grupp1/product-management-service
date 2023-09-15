@@ -14,21 +14,14 @@ services:
     networks:
       - my_network
     ports:
-      - "5000:5002"
+      - "4006:4006"
     depends_on:
-      mongo:
+      mongo-2:
         condition: service_healthy
 
-  prometheus-home-page-service:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    networks:
-      - my_network
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yaml
 
-  mongo:
+
+  mongo-2:
     image: mongo
     restart: always
     networks:
@@ -40,14 +33,14 @@ services:
       test: echo 'mongo.runCommand("ping").ok' | mongosh mongo:27017 --quiet
       interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 40s
+      retries: 20
+      start_period: 200s
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: testdb
+      MONGO_INITDB_DATABASE: allUsers
 
-  mongo-express:
+  mongo-express-2:
     image: mongo-express
     restart: always
     ports:
@@ -55,9 +48,9 @@ services:
     networks:
       - my_network
     depends_on:
-      mongo:
+      mongo-2:
         condition: service_healthy
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-2:27017/
