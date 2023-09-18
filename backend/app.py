@@ -5,7 +5,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
-
+ 
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')

@@ -11,7 +11,7 @@ db.createUser({
         },
     ],
 });
-
+ 
 db.createCollection("users");
 db.users.insertMany([{
     id: 1,
