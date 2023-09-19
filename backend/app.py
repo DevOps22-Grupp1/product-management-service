@@ -1,16 +1,14 @@
-from flask import Flask, request, jsonify
-from pymongo import MongoClient
-from bson import ObjectId
+from flask import Flask, jsonify, request, json
 from prometheus_flask_exporter import PrometheusMetrics
-
+import pymongo
+from pymongo import MongoClient
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
- 
 
-# Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017/')
-db = client['testdb']
-users_collection = db['users']
+client = MongoClient('mongo', 27017, username='root', password='example')
+
+db = client.allUsers
+query = db.users
 
 # Endpoint for user registration
 @app.route('/register', methods=['POST'])
@@ -23,12 +21,12 @@ def register_user():
         return jsonify({'message': 'Username and password are required'}), 400
 
     # Check if the username already exists
-    if users_collection.find_one({'username': username}):
+    if query.find_one({'username': username}):
         return jsonify({'message': 'Username already exists'}), 400
 
     # Create a new user document in MongoDB
     user = {'username': username, 'password': password}
-    result = users_collection.insert_one(user)
+    result = query.insert_one(user)
 
     return jsonify({'message': 'User registered successfully', 'user_id': str(result.inserted_id)}), 201
 
@@ -39,7 +37,7 @@ def login_user():
     username = data.get('username')
     password = data.get('password')
 
-    user = users_collection.find_one({'username': username, 'password': password})
+    user = query.find_one({'username': username, 'password': password})
 
     if not user:
         return jsonify({'message': 'Invalid username or password'}), 401
@@ -62,38 +60,48 @@ def update_user(user_id):
     data = request.json
 
     # Ensure that the user exists
-    existing_user = users_collection.find_one({'_id': ObjectId(user_id)})
+    existing_user = query.find_one({'_id': ObjectId(user_id)})
     if not existing_user:
         return jsonify({'message': 'User not found'}), 404
 
     # Update user information (for example, allow updating the password)
     # You can customize this part to update other user information as needed
     if 'password' in data:
-        users_collection.update_one({'_id': ObjectId(user_id)}, {'$set': {'password': data['password']}})
+        query.update_one({'_id': ObjectId(user_id)}, {'$set': {'password': data['password']}})
 
     return jsonify({'message': 'User updated successfully'}), 200
 
 @app.route('/users/<user_id>', methods=['GET'])
 def get_single_user(user_id):
-    data = {}
-
-    # Use find_one to retrieve a single document based on the provided user_id
-    user = users_collection.find_one({"_id": int(user_id)})
-    
-    if user:
-        # Convert the ObjectId to a string (if needed)
-        if '_id' in user:
-            user['_id'] = str(user['_id'])
-        
-        data = user
-
+    data = []
+    todos = query.find({"id": int(user_id)})
+    for doc in todos:
+        doc['_id'] = str(doc['_id'])  # This does the trick!
+        data.append(doc)
     return jsonify(data)
+
+    # data = {}
+
+    # # Use find_one to retrieve a single document based on the provided user_id
+    # user = query.find_one({"_id": int(user_id)})
+    
+    # if user:
+    #     # Convert the ObjectId to a string (if needed)
+    #     if '_id' in user:
+    #         user['_id'] = str(user['_id'])
+        
+    #     data = user
+
+    # return jsonify(data)
+    
+     
+    
 
 
 
 @app.route('/users/<user_id>', methods=['DELETE'])
 def delete_single_user(user_id):
-    users_collection.delete_one({"id": int(user_id)})
+    query.delete_one({"id": int(user_id)})
     return f"delete the post from the database"
 
 

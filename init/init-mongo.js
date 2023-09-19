@@ -5,13 +5,13 @@ db.createUser({
         {
             role: "readWrite",
 
-            db: "userdatabase",
+            db: "allUsers",
 
 
         },
     ],
 });
- 
+
 db.createCollection("users");
 db.users.insertMany([{
     id: 1,
