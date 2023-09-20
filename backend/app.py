@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, json
 from prometheus_flask_exporter import PrometheusMetrics
-import pymongo
 from pymongo import MongoClient
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -10,67 +9,87 @@ client = MongoClient('mongo', 27017, username='root', password='example')
 db = client.allUsers
 query = db.users
 
-# Endpoint for user registration
-@app.route('/register', methods=['POST'])
-def register_user():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+# Endpoint for user creation. Works.
+@app.route('/users', methods=['POST'])
+def create_user():
+    try:
 
-    if not username or not password:
-        return jsonify({'message': 'Username and password are required'}), 400
+        data_list = request.json
 
-    # Check if the username already exists
-    if query.find_one({'username': username}):
-        return jsonify({'message': 'Username already exists'}), 400
+        if not isinstance(data_list, list):
+            return jsonify({'message': 'JSON data should be a list of user objects'}), 400
+        
+        created_users = []
 
-    # Create a new user document in MongoDB
-    user = {'username': username, 'password': password}
-    result = query.insert_one(user)
+        for data in data_list:
+            id = data.get('id')
+            name = data.get('name')
+            email = data.get('email')
 
-    return jsonify({'message': 'User registered successfully', 'user_id': str(result.inserted_id)}), 201
+            if not 'name' or not 'email':
+                return jsonify({'message': 'Username and password are required'}), 400
 
-# Endpoint for user login
-@app.route('/login', methods=['POST'])
-def login_user():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+            #Check if the username already exists
+            if query.find_one({'name': name}):
+                return jsonify({'message': 'Username already exists'}), 400
+    
+            #Create a new user document
+            new_user = {
+                'id': id,
+                'name': name,
+                'email': email
+            }
 
-    user = query.find_one({'username': username, 'password': password})
+            #Insert the new user document into the 'users' collection
+            query.insert_one(new_user)
 
-    if not user:
-        return jsonify({'message': 'Invalid username or password'}), 401
+            created_users.append(new_user)
 
-    return jsonify({'message': 'Login successful', 'user_id': str(user['_id'])}), 200
+        return jsonify({'message': 'User created successfully'}), 201  # 201 indicates resource created
+
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
 
-
-def logout_user(user_id):
-    # Here, you can implement the logic for logging the user out.
-    # This might involve revoking authentication tokens or performing
-    # any other necessary actions.
-
-    # For this example, we'll simply return a message indicating successful logout.
-    return jsonify({'message': 'User logged out successfully'}), 200
-
-# Endpoint for updating user information
-@app.route('/users/<user_id>', methods=['PUT'])
+#Endpoint for updating user information. Works.
+@app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
-    data = request.json
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
 
-    # Ensure that the user exists
-    existing_user = query.find_one({'_id': ObjectId(user_id)})
-    if not existing_user:
-        return jsonify({'message': 'User not found'}), 404
+        # Check if the request contains a valid JSON object
+        if not data or not isinstance(data, dict):
+            return jsonify({'message': 'Invalid JSON data in the request'}), 400  # 400 indicates a bad request
 
-    # Update user information (for example, allow updating the password)
-    # You can customize this part to update other user information as needed
-    if 'password' in data:
-        query.update_one({'_id': ObjectId(user_id)}, {'$set': {'password': data['password']}})
+        # Get the updated name and email fields from the JSON data
+        updated_name = data.get('name')
+        updated_email = data.get('email')
 
-    return jsonify({'message': 'User updated successfully'}), 200
+        # Check if the user with the provided user_id exists
+        user = query.find_one({"id": user_id})
 
+        if not user:
+            return jsonify({'message': 'User not found'}), 404  # 404 indicates resource not found
+
+        # Update the user's name and email if provided in the JSON data
+        if updated_name is not None:
+            user['name'] = updated_name
+        if updated_email is not None:
+            user['email'] = updated_email
+
+        # Update the user document in the MongoDB collection
+        query.update_one({"id": user_id}, {"$set": user})
+
+        return jsonify({'message': 'User updated successfully'}), 200  # 200 indicates success
+
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500  # 500 indicates an internal server error
+
+
+
+
+#Endpoint for reading a user. Works.
 @app.route('/users/<user_id>', methods=['GET'])
 def get_single_user(user_id):
     data = []
@@ -79,37 +98,30 @@ def get_single_user(user_id):
         doc['_id'] = str(doc['_id'])  # This does the trick!
         data.append(doc)
     return jsonify(data)
-
-    # data = {}
-
-    # # Use find_one to retrieve a single document based on the provided user_id
-    # user = query.find_one({"_id": int(user_id)})
-    
-    # if user:
-    #     # Convert the ObjectId to a string (if needed)
-    #     if '_id' in user:
-    #         user['_id'] = str(user['_id'])
-        
-    #     data = user
-
-    # return jsonify(data)
-    
      
-    
 
-
-
+#Endpoint for user deletion. Works.
 @app.route('/users/<user_id>', methods=['DELETE'])
 def delete_single_user(user_id):
-    query.delete_one({"id": int(user_id)})
-    return f"delete the post from the database"
+    try:
+        # Ensure user_id is an integer
+        user_id = int(user_id)
 
+        # Check if the user with the provided user_id exists
+        user = query.find_one({"id": user_id})
+        if not user:
+            return jsonify({'message': 'User not found'}), 404  # 404 indicates resource not found
 
+        # Delete the user document with the provided user_id
+        query.delete_one({"id": user_id})
 
-@app.route('/users', methods=['DELETE'])
-def delete_all_users(user_id):
-    pass
-    
+        return jsonify({'message': 'User deleted successfully'}), 200  # 200 indicates success
+
+    except ValueError:
+        return jsonify({'message': 'Invalid user ID'}), 400  # 400 indicates a bad request
+
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500  # 500 indicates an internal server error
 
 
 @app.route('/')
