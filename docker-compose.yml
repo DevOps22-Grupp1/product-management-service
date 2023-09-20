@@ -15,7 +15,7 @@ services:
     networks:
       - my_network
     ports:
-      - "5000:5002"
+      - "5005:5002"
     depends_on:
       mongo-user-management-service:
         condition: service_healthy
