@@ -96,7 +96,7 @@ def update_user(user_id):
 #Endpoint for reading all users. Works?.
 
 
-@app.route('/api/api/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 def get_all_users():
     data = []
     todos = query.find()
