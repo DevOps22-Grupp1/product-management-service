@@ -1,11 +1,18 @@
 from flask import Flask, jsonify, request, json
 from prometheus_flask_exporter import PrometheusMetrics
+import pymongo
+import os
 from pymongo import MongoClient
+db_port = os.environ.get("DB_PORT")
+db_username = os.environ.get("DB_USERNAME")
+db_password = os.environ.get("DB_PASSWORD")
+host = os.environ.get('DB_HOST')
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 
-client = MongoClient('mongo', 27017, username='root', password='example')
-
+client = MongoClient(host, 27017,
+                     username=db_username, password=db_password)
+db_port = os.environ.get("DB_PORT")
 db = client.allUsers
 query = db.users
 
@@ -86,7 +93,17 @@ def update_user(user_id):
     except Exception as e:
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500  # 500 indicates an internal server error
 
+#Endpoint for reading all users. Works?.
 
+
+@app.route('/api/users', methods=['GET'])
+def get_all_users():
+    data = []
+    todos = query.find()
+    for doc in todos:
+        doc['_id'] = str(doc['_id'])  # This does the trick!
+        data.append(doc)
+    return jsonify(data)
 
 
 #Endpoint for reading a user. Works.
@@ -126,7 +143,7 @@ def delete_single_user(user_id):
 
 @app.route('/')
 def hello_world():
-    return 'Hello, this is user management service'
+    return "Success", 200, {"Access-Control-Allow-Origin": "*"}
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host="0.0.0.0", port=db_port, debug=False)
