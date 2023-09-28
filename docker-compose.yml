@@ -14,21 +14,25 @@ services:
     networks:
       - my_network
     ports:
-      - "5000:5002"
+      - "4006:5002"
     depends_on:
-      mongo:
+      mongo-user-management-service:
         condition: service_healthy
+    environment:
+      - DB_PORT=5002
+      - DB_USERNAME=root
+      - DB_PASSWORD=example
+      - DB_HOST=mongo-user-management-service
+  # prometheus-home-page-service:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   networks:
+  #     - my_network
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yaml
 
-  prometheus-home-page-service:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    networks:
-      - my_network
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yaml
-
-  mongo:
+  mongo-user-management-service:
     image: mongo
     restart: always
     networks:
@@ -37,7 +41,7 @@ services:
       - ./mongo-data:/data/db
       - ./init/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     healthcheck:
-      test: echo 'mongo.runCommand("ping").ok' | mongosh mongo:27017 --quiet
+      test: echo 'mongo-user-management-service.runCommand("ping").ok' | mongosh mongo-user-management-service:27017 --quiet
       interval: 5s
       timeout: 5s
       retries: 20
@@ -55,7 +59,7 @@ services:
     networks:
       - my_network
     depends_on:
-      mongo:
+      mongo-user-management-service:
         condition: service_healthy
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
