@@ -17,7 +17,7 @@ db = client.allUsers
 query = db.users
 
 # Endpoint for user creation. Works.
-@app.route('/users', methods=['POST'])
+@app.route('/api/user', methods=['POST'])
 def create_user():
     try:
 
@@ -59,7 +59,7 @@ def create_user():
 
 
 #Endpoint for updating user information. Works.
-@app.route('/users/<int:user_id>', methods=['PUT'])
+@app.route('/api/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     try:
         # Get the JSON data from the request
@@ -96,7 +96,7 @@ def update_user(user_id):
 #Endpoint for reading all users. Works?.
 
 
-@app.route('/api/users', methods=['GET'])
+@app.route('/api/api/users', methods=['GET'])
 def get_all_users():
     data = []
     todos = query.find()
@@ -107,7 +107,7 @@ def get_all_users():
 
 
 #Endpoint for reading a user. Works.
-@app.route('/users/<user_id>', methods=['GET'])
+@app.route('/api/user/<user_id>', methods=['GET'])
 def get_single_user(user_id):
     data = []
     todos = query.find({"id": int(user_id)})
@@ -118,7 +118,7 @@ def get_single_user(user_id):
      
 
 #Endpoint for user deletion. Works.
-@app.route('/users/<user_id>', methods=['DELETE'])
+@app.route('/api/user/<user_id>', methods=['DELETE'])
 def delete_single_user(user_id):
     try:
         # Ensure user_id is an integer
