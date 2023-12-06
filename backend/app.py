@@ -18,6 +18,38 @@ db = client.allUsers
 query = db.users
 
 
+@app.route("/")
+def hello_world():
+    return "Success", 200, {"Access-Control-Allow-Origin": "*"}
+
+
+# Endpoint for checking user and return true or false to login handling
+@app.route("/api/login", methods=["POST"])
+def login_user():
+    input = json.loads(request.data)
+    test = input["username"]
+    test2 = input["password"]
+    data = []
+    users = query.find(
+        {"username": test, "password": test2}, {"id": 1, "username": 1, "_id": 0}
+    )
+    for user in users:
+        # user["_id"] = str(user["_id"])  # This does the trick!
+        data.append(user)
+    return data, 201, {"Access-Control-Allow-Origin": "*"}
+
+
+# Endpoint for reading all users. Works?.
+@app.route("/api/users", methods=["GET"])
+def get_all_users():
+    data = []
+    users = query.find({}, {"password": 0, "name": 0})
+    for user in users:
+        user["_id"] = str(user["_id"])  # This does the trick!
+        data.append(user)
+    return jsonify(data)
+
+
 # Endpoint for user creation. Works.
 @app.route("/api/user", methods=["POST"])
 def create_user():
@@ -109,19 +141,6 @@ def update_user(user_id):
         )  # 500 indicates an internal server error
 
 
-# Endpoint for reading all users. Works?.
-
-
-@app.route("/api/users", methods=["GET"])
-def get_all_users():
-    data = []
-    todos = query.find({}, {"password": 0, "name": 0})
-    for doc in todos:
-        doc["_id"] = str(doc["_id"])  # This does the trick!
-        data.append(doc)
-    return jsonify(data)
-
-
 # Endpoint for reading a user. Works.
 @app.route("/api/user/<user_id>", methods=["GET"])
 def get_single_user(user_id):
@@ -167,11 +186,6 @@ def delete_single_user(user_id):
             jsonify({"message": "An error occurred", "error": str(e)}),
             500,
         )  # 500 indicates an internal server error
-
-
-@app.route("/")
-def hello_world():
-    return "Success", 200, {"Access-Control-Allow-Origin": "*"}
 
 
 if __name__ == "__main__":
