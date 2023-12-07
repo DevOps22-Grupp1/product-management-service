@@ -31,19 +31,19 @@ def login_user():
     test2 = input["password"]
     data = []
     users = query.find(
-        {"username": test, "password": test2}, {"id": 1, "username": 1, "_id": 0}
+        {"username": test, "password": test2},
+        {"id": 1, "username": 1, "avatar": 1, "_id": 0},
     )
     for user in users:
-        # user["_id"] = str(user["_id"])  # This does the trick!
         data.append(user)
-    return data, 201, {"Access-Control-Allow-Origin": "*"}
+    return data, 200, {"Access-Control-Allow-Origin": "*"}
 
 
 # Endpoint for reading all users. Works?.
 @app.route("/api/users", methods=["GET"])
 def get_all_users():
     data = []
-    users = query.find({}, {"password": 0, "name": 0})
+    users = query.find({}, {"password": 0, "name": 0, "_id": 0})
     for user in users:
         user["_id"] = str(user["_id"])  # This does the trick!
         data.append(user)
@@ -145,9 +145,8 @@ def update_user(user_id):
 @app.route("/api/user/<user_id>", methods=["GET"])
 def get_single_user(user_id):
     data = []
-    todos = query.find({"id": int(user_id)})
+    todos = query.find({"id": int(user_id)}, {"password": 0, "name": 0, "_id": 0})
     for doc in todos:
-        doc["_id"] = str(doc["_id"])  # This does the trick!
         data.append(doc)
     return jsonify(data)
 
