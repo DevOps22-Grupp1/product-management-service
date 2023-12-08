@@ -20,8 +20,8 @@ db.users.insertMany([
         email: "me@gmail.com",
         avatar: "https://robohash.org/ametveldolorem.png?size=50x50&set=set1",
         username: "emclinden0",
-        password: "lC2)Pug$Dsq*8b|6"
-
+        password: "lC2)Pug$Dsq*8b|6",
+        role: "admin"
     },
     {
         id: 2,
@@ -29,7 +29,8 @@ db.users.insertMany([
         email: "js@gmail.com",
         avatar: "https://robohash.org/quidemvelitut.png?size=50x50&set=set1",
         username: "tjewar1",
-        password: "tO6(.zfUWLjNVF"
+        password: "tO6(.zfUWLjNVF",
+        role: "admin"
     },
     {
         id: 3,
@@ -37,7 +38,8 @@ db.users.insertMany([
         email: "hs@gmail.com",
         avatar: "https://robohash.org/asperioresipsamitaque.png?size=50x50&set=set1",
         username: "sgwyneth5",
-        password: "jT7`pjwWNiT.C"
+        password: "jT7`pjwWNiT.C",
+        role: "customer"
     },
     {
         id: 4,
@@ -45,7 +47,8 @@ db.users.insertMany([
         email: "ds@gmail.com",
         avatar: "https://robohash.org/harumdelectusratione.png?size=50x50&set=set1",
         username: "akamen2",
-        password: "dP7(kp,/uW?'(j"
+        password: "dP7(kp,/uW?'(j",
+        role: "admin"
     },
     {
         id: 5,
@@ -53,7 +56,8 @@ db.users.insertMany([
         email: "ss@gmail.com",
         avatar: "https://robohash.org/commodisimiliquesunt.png?size=50x50&set=set1",
         username: "cmor3",
-        password: "uK6+bn46xMPfO#j"
+        password: "uK6+bn46xMPfO#j",
+        role: "customer"
     },
     {
         id: 6,
@@ -61,7 +65,17 @@ db.users.insertMany([
         email: "zs@gmail.com",
         avatar: "https://robohash.org/vitaeporroid.png?size=50x50&set=set1",
         username: "rporker4",
-        password: "yR7mZ*4eBKXl"
+        password: "yR7mZ*4eBKXl",
+        role: "customer"
+    },
+    {
+        id: 7,
+        name: "Testy de Testsson",
+        email: "user1@test.se",
+        avatar: "https://robohash.org/ametveldolorem.png?size=50x50&set=set1",
+        username: "user1",
+        password: "password1",
+        role: "customer"
     }
 
 ]);
