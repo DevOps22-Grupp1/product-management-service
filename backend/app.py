@@ -43,9 +43,8 @@ def login_user():
 @app.route("/api/users", methods=["GET"])
 def get_all_users():
     data = []
-    users = query.find({}, {"password": 0, "name": 0, "_id": 0})
+    users = query.find({}, {"password": 0,"email": 0, "name": 0, "_id": 0})
     for user in users:
-        user["_id"] = str(user["_id"])  # This does the trick!
         data.append(user)
     return jsonify(data)
 
@@ -145,7 +144,7 @@ def update_user(user_id):
 @app.route("/api/user/<user_id>", methods=["GET"])
 def get_single_user(user_id):
     data = []
-    todos = query.find({"id": int(user_id)}, {"password": 0, "name": 0, "_id": 0})
+    todos = query.find({"id": int(user_id)}, {"password": 0,"email": 0, "name": 0, "_id": 0})
     for doc in todos:
         data.append(doc)
     return jsonify(data)
