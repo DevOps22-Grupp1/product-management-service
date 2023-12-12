@@ -32,7 +32,7 @@ def login_user():
     data = []
     users = query.find(
         {"username": test, "password": test2},
-        {"id": 1, "username": 1, "avatar": 1,, "role": 1 "_id": 0},
+        {"id": 1, "username": 1, "avatar": 1, "role": 1 ,"_id": 0},
     )
     for user in users:
         data.append(user)
