@@ -32,7 +32,7 @@ def login_user():
     data = []
     users = query.find(
         {"username": test, "password": test2},
-        {"id": 1, "username": 1, "avatar": 1, "role": 1 ,"_id": 0},
+        {"id": 1, "username": 1, "avatar": 1, "role": 1, "_id": 0},
     )
     for user in users:
         data.append(user)
@@ -49,44 +49,32 @@ def get_all_users():
     return jsonify(data)
 
 
+@app.route("/api/product", methods=["POST"])
+def post_products():
+    data = json.loads(request.data)
+    data["id"] = int(increment_post())
+    query.insert_one(data)
+    return "a new post has been added", 201, {"Access-Control-Allow-Origin": "*"}
+
+
 # Endpoint for user creation. Works.
 @app.route("/api/user", methods=["POST"])
 def create_user():
     try:
-        data_list = request.json
-
-        if not isinstance(data_list, list):
-            return (
-                jsonify({"message": "JSON data should be a list of user objects"}),
-                400,
-            )
-
-        created_users = []
-
-        for data in data_list:
-            id = data.get("id")
-            name = data.get("name")
-            email = data.get("email")
-
-            if not "name" or not "email":
-                return jsonify({"message": "Username and password are required"}), 400
-
-            # Check if the username already exists
-            if query.find_one({"name": name}):
-                return jsonify({"message": "Username already exists"}), 400
-
-            # Create a new user document
-            new_user = {"id": id, "name": name, "email": email}
-
-            # Insert the new user document into the 'users' collection
-            query.insert_one(new_user)
-
-            created_users.append(new_user)
-
+        data_list = json.loads(request.data)
+        if not data_list["username"] or not data_list["name"]:
+            return jsonify({"message": "Username and/or name are required"}), 400
+        if not data_list["password"] or not data_list["email"]:
+            return jsonify({"message": "Password and/or email are required"}), 400
+        if query.find_one({"password": data_list["password"]}):
+            return jsonify({"message": "Password already exists"}), 400
+        data_list["id"] = int(increment_post())
+        # Insert the new user document into the 'users' collection
+        query.insert_one(data_list)
         return (
             jsonify({"message": "User created successfully"}),
             201,
-        )  # 201 indicates resource created
+        )
 
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
@@ -186,6 +174,11 @@ def delete_single_user(user_id):
             jsonify({"message": "An error occurred", "error": str(e)}),
             500,
         )  # 500 indicates an internal server error
+
+
+def increment_post():
+    id_fetch = query.find_one(sort=[("id", pymongo.DESCENDING)])
+    return str(id_fetch["id"] + 1)
 
 
 if __name__ == "__main__":
