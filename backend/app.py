@@ -11,9 +11,7 @@ db_password = os.environ.get("DB_PASSWORD")
 host = os.environ.get("DB_HOST")
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
-
 client = MongoClient(host, int(db_port), username=db_username, password=db_password)
-db_port = os.environ.get("DB_PORT")
 db = client.allUsers
 query = db.users
 
