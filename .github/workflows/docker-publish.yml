@@ -29,13 +29,13 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t passwordnotsafe/produkt-catalog-service ./backend
-          docker build -t passwordnotsafe/produkt-catalog-service:${{ github.sha }} ./backend
+          docker build -t passwordnotsafe/user-management-service ./backend
+          docker build -t passwordnotsafe/user-management-service:${{ github.sha }} ./backend
 
       - name: Push Docker Image
         run: |
-          docker push passwordnotsafe/produkt-catalog-service
-          docker push passwordnotsafe/produkt-catalog-service:${{ github.sha }}
+          docker push passwordnotsafe/user-management-service
+          docker push passwordnotsafe/user-management-service:${{ github.sha }}
 
       
       - name: List all ids
