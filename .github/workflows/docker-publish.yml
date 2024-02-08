@@ -46,7 +46,7 @@ jobs:
           curl --request POST \
             --url 'https://api.github.com/repos/DevOps22-Grupp1/scamazon/dispatches' \
             --header 'authorization: token ${{secrets.TOKEN}}' \
-            --data '{"event_type": "custom_event_name"}'
+            --data '{"event_type": "update-user"}'
 
       # - name: Trigger fetch new sha update to k8 deployment file.
       #   run: |
