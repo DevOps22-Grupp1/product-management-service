@@ -24,8 +24,16 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t passwordnotsafe/user-management-service ./backend
+          docker build -t passwordnotsafe/produkt-catalog-service:${{ github.sha }} ./backend
 
       - name: Push Docker Image
         run: |
-          docker push passwordnotsafe/user-management-service
+          docker push passwordnotsafe/produkt-catalog-service:${{ github.sha }}
+      
+      - name: Trigger fetch new sha update to k8 deployment file.
+        run: |
+          RESPONSE=$(curl -X POST \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          https://api.github.com/repos/DevOps22-Grupp1/scamazon/dispatches \
+          -d '{"event_type": "custom_event_name", "client_payload": {"workflow": "custom-event"}}'
+          )
