@@ -37,20 +37,7 @@ jobs:
       
       - name: List all ids
         run: |
-          RESPONSE=$(curl \
-            -H "Authorization: RESPONSE=$(curl \
-            -H "Authorization: token YOUR_PERSONAL_ACCESS_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/OWNER/REPO/actions/workflows
-          )
-
-            echo "$RESPONSE"
-
-          # -H "Accept: application/vnd.github.v3+json" \
-          # https://api.github.com/repos/OWNER/REPO/actions/workflows
-          # )
-
-          # echo "$RESPONSE"
+           RESPONSE=$(curl https://api.github.com/repos/DevOps22-Grupp1/scamazon/actions/runs)
 
       # - name: Trigger fetch new sha update to k8 deployment file.
       #   run: |
