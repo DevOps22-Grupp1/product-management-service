@@ -44,7 +44,7 @@ jobs:
           echo "$RESPONSE"
 
           curl --request POST \
-            --url 'https://api.github.com/repos/<USERNAME>/<REPO>/dispatches' \
+            --url 'https://api.github.com/repos/DevOps22-Grupp1/scamazon/dispatches' \
             --header 'authorization: token ${{secrets.TOKEN}}' \
             --data '{"event_type": "custom_event_name"}'
 
