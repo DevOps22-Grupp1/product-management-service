@@ -41,7 +41,8 @@ jobs:
         run: |
           curl --request POST \
             --url 'https://api.github.com/repos/DevOps22-Grupp1/scamazon/actions/workflows/user-update-sha.yml/dispatches' \
-            --header 'authorization: token ${{secrets.TOKEN}}' 
+            -H 'Authorization: Bearer ${{secrets.TOKEN}}'
+            -d '{"ref:" "main"}'
 
       # - name: Trigger fetch new sha update to k8 deployment file.
       #   run: |
