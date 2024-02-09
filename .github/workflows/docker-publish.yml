@@ -37,16 +37,11 @@ jobs:
           docker push passwordnotsafe/user-management-service
           docker push passwordnotsafe/user-management-service:${{ github.sha }}
 
-      
-      - name: List all ids
+      - name: Trigger fetch new sha update to k8 deployment file.
         run: |
-          RESPONSE=$(curl https://api.github.com/repos/DevOps22-Grupp1/scamazon/actions/runs)
-          echo "$RESPONSE"
-
           curl --request POST \
-            --url 'https://api.github.com/repos/DevOps22-Grupp1/scamazon/dispatches' \
-            --header 'authorization: token ${{secrets.TOKEN}}' \
-            --data '{"event_type": "update-user"}'
+            --url 'https://api.github.com/repos/DevOps22-Grupp1/scamazon/actions/workflows/user-update-sha.yml/dispatches' \
+            --header 'authorization: token ${{secrets.TOKEN}}' 
 
       # - name: Trigger fetch new sha update to k8 deployment file.
       #   run: |
